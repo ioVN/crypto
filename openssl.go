@@ -59,7 +59,6 @@ $ openssl pkcs12 -in private.p12 -clcerts -nokeys -out PublicKey.cer
 $ openssl pkcs12 -in private.p12 -nodes -nocerts | openssl rsa -out PrivateKey.key
 */
 func (ssl *OpenSSL) ImportP12(data []byte, pwd string) error {
-
 	key, cert, err := pkcs12.Decode(data, pwd)
 	if err != nil {
 		return err
@@ -144,6 +143,11 @@ func (ssl *OpenSSL) MakeCertificate(opt *CertOption) error {
 	return nil
 }
 
+/*
+ExportP12 : save keyPair to pkcs12 type.
+
+Note: Must call after GenRSA() or ImportP12() function
+*/
 func (ssl *OpenSSL) ExportP12(pwd string, output string) error {
 	if ssl.private == nil {
 		return errors.New("must call after GenRSA() function")
@@ -169,14 +173,22 @@ PrivateKey : Get *rsa.PrivateKey object.
 Note: Must call after GenRSA() or ImportP12() function
 */
 func (ssl *OpenSSL) PrivateKey() *rsa.PrivateKey {
+	if ssl.private == nil {
+		panic("must call after GenRSA() function")
+	}
 	return ssl.private
 }
 
 /*
 Certificate : Get  *x509.Certificate object.
 
-Note: Must call after GenRSA() or ImportP12() function
+Note: Must call after  GenRSA() or ImportP12() function
 */
 func (ssl *OpenSSL) Certificate() *x509.Certificate {
+	if ssl.cert == nil {
+		if err := ssl.MakeCertificate(&CertOptDefault); err != nil {
+			panic("must call after GenRSA() function")
+		}
+	}
 	return ssl.cert
 }
