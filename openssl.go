@@ -9,7 +9,8 @@ import (
 	"errors"
 	"math/big"
 	"os"
-	"software.sslmate.com/src/go-pkcs12"
+	//"software.sslmate.com/src/go-pkcs12"
+	"github.com/ioVN/crypto/pkcs12"
 	"strings"
 	"time"
 )
